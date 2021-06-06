@@ -35,9 +35,15 @@
 #define MI_INDIGO_COLOR 1011
 #define MI_VIOLET_COLOR 1012
 
-# define MI_LINE_DDA 1013
-# define MI_LINE_MID 1014
-# define MI_LINE_PARA 1015
+#define MI_LINE_DDA 1013
+#define MI_LINE_MID 1014
+#define MI_LINE_PARA 1015
+
+#define MI_CIRCLE_DIRECT 1016
+#define MI_CIRCLE_POLAR 1017
+#define MI_CIRCLE_ITERATIVE 1018
+#define MI_CIRCLE_MID 1019
+#define MI_CIRCLE_MOD_MID 1020
 
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
@@ -109,7 +115,9 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
 
 /* Global variables */
 COLORREF color = BLACK;
-
+enum algorithms{line_DDA, line_mid, line_para, circle_dir, circle_polar,
+                circle_iter, circle_mid, circle_mod_mid};
+int alg = line_DDA;
 
 /*  This function is called by the Windows function DispatchMessage()  */
 
@@ -165,11 +173,11 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             AppendMenu(hLine, MF_STRING, MI_LINE_PARA, "parametric");
 
             /* Circle sub-menus */
-            AppendMenu(hCircle, MF_STRING, NULL, "Direct");
-            AppendMenu(hCircle, MF_STRING, NULL, "Polar");
-            AppendMenu(hCircle, MF_STRING, NULL, "Iterative Polar");
-            AppendMenu(hCircle, MF_STRING, NULL, "Midpoint");
-            AppendMenu(hCircle, MF_STRING, NULL, "Modified Midpoint");
+            AppendMenu(hCircle, MF_STRING, MI_CIRCLE_DIRECT, "Direct");
+            AppendMenu(hCircle, MF_STRING, MI_CIRCLE_POLAR, "Polar");
+            AppendMenu(hCircle, MF_STRING, MI_CIRCLE_ITERATIVE, "Iterative Polar");
+            AppendMenu(hCircle, MF_STRING, MI_CIRCLE_MID, "Midpoint");
+            AppendMenu(hCircle, MF_STRING, MI_CIRCLE_MOD_MID, "Modified Midpoint");
 
             /* Fill sub-menus */
             AppendMenu(hFill, MF_STRING, NULL, "Quarter 1");
@@ -261,6 +269,54 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     color = VIOLET;
                     std::cout << "Color changed to violet!\n\n"; break;
+                }
+
+                case MI_LINE_DDA:
+                {
+                    alg = line_DDA;
+                    std::cout << "algorithm changed to line DDA!\n\n"; break;
+                }
+
+                case MI_LINE_MID:
+                {
+                    alg = line_mid;
+                    std::cout << "algorithm changed to line midpoint!\n\n"; break;
+                }
+
+                case MI_LINE_PARA:
+                {
+                    alg = line_para;
+                    std::cout << "algorithm changed to line parametric!\n\n"; break;
+                }
+
+                case MI_CIRCLE_DIRECT:
+                {
+                    alg = circle_dir;
+                    std::cout << "algorithm changed to circle direct!\n\n"; break;
+                }
+
+                case MI_CIRCLE_POLAR:
+                {
+                    alg = circle_polar;
+                    std::cout << "algorithm changed to circle polar!\n\n"; break;
+                }
+
+                case MI_CIRCLE_ITERATIVE:
+                {
+                    alg = circle_iter;
+                    std::cout << "algorithm changed to circle iterative!\n\n"; break;
+                }
+
+                case MI_CIRCLE_MID:
+                {
+                    alg = circle_mid;
+                    std::cout << "algorithm changed to circle midpoint!\n\n"; break;
+                }
+
+                case MI_CIRCLE_MOD_MID:
+                {
+                    alg = circle_mod_mid;
+                    std::cout << "algorithm changed to circle modified midpoint!\n\n"; break;
                 }
 
                 default:
