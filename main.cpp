@@ -131,6 +131,7 @@ enum algorithms{line_DDA, line_mid, line_para,
                 ellipse_dir, ellipse_polar,
                 clip_point, clip_line};
 int alg = line_DDA;
+int click_count = 0;
 
 /*  This function is called by the Windows function DispatchMessage()  */
 
@@ -211,8 +212,250 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             break;
         }
 
+        case WM_LBUTTONUP:              /* actions when left click is pressed */
+        {
+            int x = LOWORD(lParam);
+            int y = HIWORD(lParam);
+
+            switch (alg)
+            {
+                case line_DDA:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for end point
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case line_mid:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for end point
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case line_para:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for end point
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case circle_dir:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for end point
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case circle_polar:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for end point
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case circle_iter:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for end point
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case circle_mid:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for end point
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case circle_mod_mid:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for end point
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case fill_q1:
+                {
+                    // code for quarter fill
+                    break;
+                }
+
+                case fill_q2:
+                {
+                    // code for quarter fill
+                    break;
+                }
+
+                case fill_q3:
+                {
+                    // code for quarter fill
+                    break;
+                }
+
+                case fill_q4:
+                {
+
+                    // code for quarter fill
+                    break;
+                }
+
+                case ellipse_dir:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else if (click_count == 1)
+                    {
+                        // code for point 1
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for point 2
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case ellipse_polar:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point
+                        click_count++;
+                    }
+                    else if (click_count == 1)
+                    {
+                        // code for point 1
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for point 2
+                        click_count = 0; // reset click count
+                    }
+                    break;
+                }
+
+                case clip_point:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point of rectangular
+                        click_count++;
+                    }
+                    else if (click_count == 1)
+                    {
+                        // code for end point of rectangular
+                        click_count++;
+                    }
+                    else
+                    {
+                        // code for points
+                        // resets by default when changing the algorithm (many points)
+                    }
+                    break;
+                }
+
+                case clip_line:
+                {
+                    if (click_count == 0)
+                    {
+                        // code for start point of rectangular
+                    }
+                    else if (click_count == 1)
+                    {
+                        // code for end point of rectangular
+                    }
+                    else if (click_count % 2 == 0)
+                    {
+                        // code for start point of lines
+                    }
+                    else
+                    {
+                        // code for end point of lines
+                        // resets by default when changing the algorithm (many lines)
+                    }
+
+                    click_count++;
+                    break;
+                }
+
+                default:
+                    break;
+            }
+        }
+
         case WM_COMMAND:                /* bind menus to actions */
         {
+
             switch (LOWORD(wParam))
             {
                 /************** File sub-menus **************/
@@ -289,18 +532,21 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 /************** Line sub-menus **************/
                 case MI_LINE_DDA:
                 {
+                    click_count = 0;
                     alg = line_DDA;
                     std::cout << "algorithm changed to line DDA!\n\n"; break;
                 }
 
                 case MI_LINE_MID:
                 {
+                    click_count = 0;
                     alg = line_mid;
                     std::cout << "algorithm changed to line midpoint!\n\n"; break;
                 }
 
                 case MI_LINE_PARA:
                 {
+                    click_count = 0;
                     alg = line_para;
                     std::cout << "algorithm changed to line parametric!\n\n"; break;
                 }
@@ -308,30 +554,35 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 /************** Circle sub-menus **************/
                 case MI_CIRCLE_DIRECT:
                 {
+                    click_count = 0;
                     alg = circle_dir;
                     std::cout << "algorithm changed to circle direct!\n\n"; break;
                 }
 
                 case MI_CIRCLE_POLAR:
                 {
+                    click_count = 0;
                     alg = circle_polar;
                     std::cout << "algorithm changed to circle polar!\n\n"; break;
                 }
 
                 case MI_CIRCLE_ITERATIVE:
                 {
+                    click_count = 0;
                     alg = circle_iter;
                     std::cout << "algorithm changed to circle iterative!\n\n"; break;
                 }
 
                 case MI_CIRCLE_MID:
                 {
+                    click_count = 0;
                     alg = circle_mid;
                     std::cout << "algorithm changed to circle midpoint!\n\n"; break;
                 }
 
                 case MI_CIRCLE_MOD_MID:
                 {
+                    click_count = 0;
                     alg = circle_mod_mid;
                     std::cout << "algorithm changed to circle modified midpoint!\n\n"; break;
                 }
@@ -364,12 +615,14 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 /************** Ellipse sub-menus **************/
                 case MI_ELLIPSE_DIRECT:
                 {
+                    click_count = 0;
                     alg = ellipse_dir;
                     std::cout << "algorithm changed to ellipse direct!\n\n"; break;
                 }
 
                 case MI_ELLIPSE_POLAR:
                 {
+                    click_count = 0;
                     alg = ellipse_polar;
                     std::cout << "algorithm changed to ellipse polar!\n\n"; break;
                 }
@@ -377,12 +630,14 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 /************** Clip sub-menus **************/
                 case MI_CLIP_POINT:
                 {
+                    click_count = 0;
                     alg = clip_point;
                     std::cout << "algorithm changed to clip point!\n\n"; break;
                 }
 
                 case MI_CLIP_LINE:
                 {
+                    click_count = 0;
                     alg = clip_line;
                     std::cout << "algorithm changed to clip line!\n\n"; break;
                 }
