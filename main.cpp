@@ -45,6 +45,16 @@
 #define MI_CIRCLE_MID 1019
 #define MI_CIRCLE_MOD_MID 1020
 
+#define MI_FILL_Q1 1021
+#define MI_FILL_Q2 1022
+#define MI_FILL_Q3 1023
+#define MI_FILL_Q4 1024
+
+#define MI_ELLIPSE_DIRECT 1025
+#define MI_ELLIPSE_POLAR 1026
+
+#define MI_CLIP_POINT 1027
+#define MI_CLIP_LINE 1028
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
 
@@ -115,8 +125,11 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
 
 /* Global variables */
 COLORREF color = BLACK;
-enum algorithms{line_DDA, line_mid, line_para, circle_dir, circle_polar,
-                circle_iter, circle_mid, circle_mod_mid};
+enum algorithms{line_DDA, line_mid, line_para,
+                circle_dir, circle_polar, circle_iter, circle_mid, circle_mod_mid,
+                fill_q1, fill_q2, fill_q3, fill_q4,
+                ellipse_dir, ellipse_polar,
+                clip_point, clip_line};
 int alg = line_DDA;
 
 /*  This function is called by the Windows function DispatchMessage()  */
@@ -180,18 +193,18 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             AppendMenu(hCircle, MF_STRING, MI_CIRCLE_MOD_MID, "Modified Midpoint");
 
             /* Fill sub-menus */
-            AppendMenu(hFill, MF_STRING, NULL, "Quarter 1");
-            AppendMenu(hFill, MF_STRING, NULL, "Quarter 2");
-            AppendMenu(hFill, MF_STRING, NULL, "Quarter 3");
-            AppendMenu(hFill, MF_STRING, NULL, "Quarter 4");
+            AppendMenu(hFill, MF_STRING, MI_FILL_Q1, "Quarter 1");
+            AppendMenu(hFill, MF_STRING, MI_FILL_Q2, "Quarter 2");
+            AppendMenu(hFill, MF_STRING, MI_FILL_Q3, "Quarter 3");
+            AppendMenu(hFill, MF_STRING, MI_FILL_Q4, "Quarter 4");
 
             /* Ellipse sub-menus */
-            AppendMenu(hEllipse, MF_STRING, NULL, "Direct");
-            AppendMenu(hEllipse, MF_STRING, NULL, "Polar");
+            AppendMenu(hEllipse, MF_STRING, MI_ELLIPSE_DIRECT, "Direct");
+            AppendMenu(hEllipse, MF_STRING, MI_ELLIPSE_POLAR, "Polar");
 
             /* Clip sub-menus */
-            AppendMenu(hClip, MF_STRING, NULL, "Point");
-            AppendMenu(hClip, MF_STRING, NULL, "Line");
+            AppendMenu(hClip, MF_STRING, MI_CLIP_POINT, "Point");
+            AppendMenu(hClip, MF_STRING, MI_CLIP_LINE, "Line");
 
             SetMenu(hwnd, hMenubar);
 
@@ -202,6 +215,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         {
             switch (LOWORD(wParam))
             {
+                /************** File sub-menus **************/
                 case MI_CLEAR:
                 {
                     /* Write clear code here */
@@ -225,6 +239,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     break;
                 }
 
+                /************** Color sub-menus **************/
                 case MI_BLACK_COLOR:
                 {
                     color = BLACK;
@@ -271,6 +286,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     std::cout << "Color changed to violet!\n\n"; break;
                 }
 
+                /************** Line sub-menus **************/
                 case MI_LINE_DDA:
                 {
                     alg = line_DDA;
@@ -289,6 +305,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     std::cout << "algorithm changed to line parametric!\n\n"; break;
                 }
 
+                /************** Circle sub-menus **************/
                 case MI_CIRCLE_DIRECT:
                 {
                     alg = circle_dir;
@@ -317,6 +334,57 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     alg = circle_mod_mid;
                     std::cout << "algorithm changed to circle modified midpoint!\n\n"; break;
+                }
+
+                /************** Fill sub-menus **************/
+                case MI_FILL_Q1:
+                {
+                    alg = fill_q1;
+                    std::cout << "algorithm changed to fill circle quarter 1!\n\n"; break;
+                }
+
+                case MI_FILL_Q2:
+                {
+                    alg = fill_q2;
+                    std::cout << "algorithm changed to fill circle quarter 2!\n\n"; break;
+                }
+
+                case MI_FILL_Q3:
+                {
+                    alg = fill_q3;
+                    std::cout << "algorithm changed to fill circle quarter 3!\n\n"; break;
+                }
+
+                case MI_FILL_Q4:
+                {
+                    alg = fill_q4;
+                    std::cout << "algorithm changed to fill circle quarter 4!\n\n"; break;
+                }
+
+                /************** Ellipse sub-menus **************/
+                case MI_ELLIPSE_DIRECT:
+                {
+                    alg = ellipse_dir;
+                    std::cout << "algorithm changed to ellipse direct!\n\n"; break;
+                }
+
+                case MI_ELLIPSE_POLAR:
+                {
+                    alg = ellipse_polar;
+                    std::cout << "algorithm changed to ellipse polar!\n\n"; break;
+                }
+
+                /************** Clip sub-menus **************/
+                case MI_CLIP_POINT:
+                {
+                    alg = clip_point;
+                    std::cout << "algorithm changed to clip point!\n\n"; break;
+                }
+
+                case MI_CLIP_LINE:
+                {
+                    alg = clip_line;
+                    std::cout << "algorithm changed to clip line!\n\n"; break;
                 }
 
                 default:
