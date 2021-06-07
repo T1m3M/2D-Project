@@ -174,12 +174,41 @@ void midpoint(HDC hdc,int xc,int yc,int r,COLORREF color)
     }
 
 }
-
 void Circle_MidPoint(HDC hdc,int x1,int y1,int x2,int y2,COLORREF color)
 {
                int r = sqrt(pow((x2-x1), 2) + pow((y2-y1), 2));
                 midpoint(hdc, x1, y1, r,color);
 }
+
+
+
+/// (2) Iterative Polar
+int Round(double x){ return (int)(x+0.5); }
+void IterativePolar(HDC hdc,int xc,int yc, int R,COLORREF color)
+{
+    double x=R,y=0;
+    double dtheta=1.0/R;
+    double cdtheta=cos(dtheta);
+    double sdtheta=sin(dtheta);
+    Draw8points(hdc,xc,yc,R,0,color);
+
+    while(x>y)
+    {
+        double x1 = x*cdtheta-y*sdtheta;
+        y = x*sdtheta+y*cdtheta;
+        x = x1;
+        Draw8points(hdc,xc,yc,Round(x),Round(y),color);
+    }
+}
+void Circle_IterativePolar(HDC hdc , int x1,int y1,int x2,int y2,COLORREF color)
+{
+    int r = sqrt(pow((x2-x1), 2) + pow((y2-y1), 2));
+    IterativePolar(hdc,x1,y1,r,color);
+
+}
+
+
+
 
 
 
@@ -338,12 +367,16 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        // code for start point
+                        x1 = x;
+                        y1 = y;
+
                         click_count++;
                     }
                     else
                     {
-                        // code for end point
+                        int x2 = x;
+                        int y2 = y;
+                        Circle_IterativePolar(hdc ,x1 ,y1 ,x2 ,y2,color);
                         click_count = 0; // reset click count
                     }
                     break;
