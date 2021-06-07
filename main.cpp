@@ -256,6 +256,32 @@ void Circle_Polar(HDC hdc , int x1,int y1,int x2,int y2,COLORREF color)
 
 
 
+/// (5) Modified Midpoint
+void modified_midpoint(HDC hdc,int xc,int yc, int R,COLORREF color)
+{
+        int x=0,y=R;
+        int d=1-R;
+        Draw8points(hdc,xc,yc,x,y,color);
+        while(x<y)
+        {
+            if(d<0)
+            d+=2*x+2;
+        else
+        {
+             d+=2*(x-y)+5;
+              y--;
+        }
+        x++;
+        Draw8points(hdc,xc,yc,x,y,color);
+        }
+}
+
+void Circle_modified_midpoint(HDC hdc , int x1,int y1,int x2,int y2,COLORREF color)
+{
+    int r = sqrt(pow((x2-x1), 2) + pow((y2-y1), 2));
+    modified_midpoint(hdc,x1,y1,r,color);
+
+}
 
 
 /// **************************************** End my Work**********************************************************************
@@ -471,12 +497,16 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        // code for start point
+                        x1 = x;
+                        y1 = y;
                         click_count++;
                     }
                     else
                     {
-                        // code for end point
+                        int x2 = x;
+                        int y2 = y;
+                        Circle_modified_midpoint(hdc ,x1 ,y1 ,x2 ,y2,color);
+
                         click_count = 0; // reset click count
                     }
                     break;
