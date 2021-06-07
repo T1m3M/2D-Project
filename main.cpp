@@ -213,7 +213,6 @@ void Circle_IterativePolar(HDC hdc , int x1,int y1,int x2,int y2,COLORREF color)
 }
 
 
-
 /// (3) Direct.
 void Direct(HDC hdc,int xc,int yc, int R,COLORREF color)
 {
@@ -324,6 +323,17 @@ void DDA(HDC hdc,int xs,int ys,int xe,int ye,COLORREF color)
     }
 }
 
+
+/// (2) Parametric .
+void parametric(HDC hdc, double x1, double y1, double x2, double y2, COLORREF color) {
+    double dx = x2 - x1;
+    double dy = y2 - y1;
+    for (double t = 0; t < 1; t += 0.001) {
+        int x = x1 + (dx * t);
+        int y = y1 + (dy * t);
+        SetPixel(hdc, x, y, color);
+    }
+}
 
 
 
@@ -452,14 +462,17 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
                 case line_para:
                 {
-                    if (click_count == 0)
+                     if (click_count == 0)
                     {
-                        // code for start point
+                        x1 = x;
+                        y1 = y;
                         click_count++;
                     }
                     else
                     {
-                        // code for end point
+                        int x2 = x;
+                        int y2 = y;
+                        parametric(hdc ,x1 ,y1 ,x2 ,y2,color);
                         click_count = 0; // reset click count
                     }
                     break;
