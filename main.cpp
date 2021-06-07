@@ -336,6 +336,116 @@ void parametric(HDC hdc, double x1, double y1, double x2, double y2, COLORREF co
 }
 
 
+/// (3) MidPoint.
+void Swap2(int& xs, int& ys, int& xe, int& ye)
+{
+    int temp = xs;
+    xs = xe;
+    xe = temp;
+    temp = ys;
+    ys = ye;
+    ye = temp;
+}
+void LineMidpoint (HDC hdc, int x1, int y1, int x2, int y2, COLORREF c)
+{
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    int d, d1, d2;
+
+    if(dx == 0 && dy == 0)
+    {
+        SetPixel(hdc, x1, y1, c);
+        return;
+    }
+    if (abs(dy) < abs(dx))
+    {
+        if (x1 > x2)
+        {
+            Swap2(x1, y1, x2, y2);
+            dy *= -1;
+            dx *= -1;
+        }
+        int x = x1, y = y1;
+        SetPixel(hdc, x, y, c);
+
+        if (dy > 0) //f(x+1,y+0.5)
+        {
+            d = dx - 2 * dy;
+            d1 = -2 * dy;
+            d2 = 2 * (dx - dy);
+        }
+        else //f(x-1,y+0.5)
+        {
+            d = dx + 2 * dy;
+            d1 = 2 * dy;
+            d2 = 2 * (dx + dy);
+        }
+
+        while (x < x2)
+        {
+            x++;
+            if (d > 0)
+            {
+                d += d1;
+            }
+            else
+            {
+                d += d2;
+
+                if (dy > 0)
+                    y++;
+                else
+                    y--;
+            }
+            SetPixel(hdc, x, y, c);
+        }
+    }
+    else if (abs(dx) < abs(dy))
+    {
+        if (y1 > y2)
+        {
+            Swap2(x1, y1, x2, y2);
+            dy *= -1;
+            dx *= -1;
+        }
+        int x = x1, y = y1;
+        SetPixel(hdc, x, y, c);
+
+        if (dx > 0)		//f(x+0.5,y+1)
+        {
+            d = dy - 2 * dx;
+            d1 = -2 * dx;
+            d2 = 2 * (dy - dx);
+        }
+        else //f(x-0.5,y+1)
+        {
+            d = dy + 2 * dx;
+            d1 = 2 * dx;
+            d2 = 2 * (dy + dx);
+        }
+
+        while (y < y2)
+        {
+            y++;
+            if (d > 0)
+            {
+                d += d1;
+            }
+            else
+            {
+                d += d2;
+                if (dx > 0)
+                    x++;
+                else
+                    x--;
+            }
+            SetPixel(hdc, x, y, c);
+        }
+    }
+}
+
+
+
 
 /// **************************************** End my Work**********************************************************************
 
@@ -449,12 +559,15 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        // code for start point
+                        x1 = x;
+                        y1 = y;
                         click_count++;
                     }
                     else
                     {
-                        // code for end point
+                        int x2 = x;
+                        int y2 = y;
+                        LineMidpoint(hdc ,x1 ,y1 ,x2 ,y2,color);
                         click_count = 0; // reset click count
                     }
                     break;
