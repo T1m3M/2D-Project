@@ -141,6 +141,11 @@ int click_count = 0;
 
 /// Circle.
 
+void Swap(int& x,int& y){
+int tmp=x;
+x=y;
+y=tmp;
+}
 int Round(double x){ return (int)(x+0.5); }
 void Draw8points(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
 {
@@ -282,6 +287,44 @@ void Circle_modified_midpoint(HDC hdc , int x1,int y1,int x2,int y2,COLORREF col
     modified_midpoint(hdc,x1,y1,r,color);
 
 }
+///-----------------------------------------------------------------------------------------------------------------------------------
+
+
+/// Line.
+
+/// (1) DDA.
+void DDA(HDC hdc,int xs,int ys,int xe,int ye,COLORREF color)
+{
+    int dx=xe-xs;
+    int dy=ye-ys;
+    SetPixel(hdc,xs,ys,color);
+    if(abs(dx)>=abs(dy))
+    {
+        int x=xs,xinc= dx>0?1:-1;
+        double y=ys,yinc=(double)dy/dx*xinc;
+        while(x!=xe)
+        {
+            x+=xinc;
+            y+=yinc;
+            SetPixel(hdc,x,round(y),color);
+        }
+
+    }
+
+    else
+    {
+        int y=ys,yinc= dy>0?1:-1;
+        double x=xs,xinc=(double)dx/dy*yinc;
+        while(y!=ye)
+        {
+            x+=xinc;
+            y+=yinc;
+            SetPixel(hdc,round(x),y,color);
+        }
+    }
+}
+
+
 
 
 /// **************************************** End my Work**********************************************************************
@@ -376,14 +419,17 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             {
                 case line_DDA:
                 {
-                    if (click_count == 0)
+                     if (click_count == 0)
                     {
-                        // code for start point
+                        x1 = x;
+                        y1 = y;
                         click_count++;
                     }
                     else
                     {
-                        // code for end point
+                        int x2 = x;
+                        int y2 = y;
+                        DDA(hdc ,x1 ,y1 ,x2 ,y2,color);
                         click_count = 0; // reset click count
                     }
                     break;
