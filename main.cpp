@@ -133,6 +133,59 @@ enum algorithms{line_DDA, line_mid, line_para,
 int alg = line_DDA;
 int click_count = 0;
 
+/*
+* Bahaa El-Deen Osama .
+*/
+
+
+
+/// Circle.
+
+/// (1) MidPoint.
+void Draw8points(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+{
+    SetPixel(hdc, xc+x, yc+y, color);
+    SetPixel(hdc, xc-x, yc+y, color);
+    SetPixel(hdc, xc+x, yc-y, color);
+    SetPixel(hdc, xc-x, yc-y, color);
+    SetPixel(hdc, xc-y, yc+x, color);
+    SetPixel(hdc, xc+y, yc-x, color);
+    SetPixel(hdc, xc+y, yc+x, color);
+    SetPixel(hdc, xc-y, yc-x, color);
+}
+
+void midpoint(HDC hdc,int xc,int yc,int r,COLORREF color)
+{
+    int x=0;
+    int y=r;
+    double d=1-r;
+    while(x<y){
+
+        if(d<=0){
+            d=d+2*x+3;
+            x++;
+        }
+        else{
+            d=d+2*(x-y)+5;
+            x++;
+            y--;
+        }
+        Draw8points(hdc,x,y,xc,yc,color);
+    }
+
+}
+
+void Circle_MidPoint(HDC hdc,int x1,int y1,int x2,int y2,COLORREF color)
+{
+               int r = sqrt(pow((x2-x1), 2) + pow((y2-y1), 2));
+                midpoint(hdc, x1, y1, r,color);
+}
+
+
+
+
+/// **************************************** End my Work**********************************************************************
+
 /*  This function is called by the Windows function DispatchMessage()  */
 
 LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -216,6 +269,8 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         {
             int x = LOWORD(lParam);
             int y = HIWORD(lParam);
+
+             int x1,y1;
 
             switch (alg)
             {
@@ -313,12 +368,16 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        // code for start point
+                        x1 = x;
+                        y1 = y;
                         click_count++;
                     }
                     else
                     {
-                        // code for end point
+                        int x2 = x;
+                        int y2 = y;
+                        Circle_MidPoint(hdc ,x1 ,y1 ,x2 ,y2,color);
+
                         click_count = 0; // reset click count
                     }
                     break;
