@@ -232,6 +232,29 @@ void Circle_Direct(HDC hdc , int x1,int y1,int x2,int y2,COLORREF color)
 
 
 
+/// (4) Polar
+void Polar(HDC hdc,int xc,int yc, int R,COLORREF color)
+{
+        int x=R,y=0;
+        double theta=0,dtheta=1.0/R;
+        Draw8points(hdc,xc,yc,x,y,color);
+        while(x>y)
+        {
+            theta+=dtheta;
+            x=round(R*cos(theta));
+            y=round(R*sin(theta));
+            Draw8points(hdc,xc,yc,x,y,color);
+        }
+}
+
+void Circle_Polar(HDC hdc , int x1,int y1,int x2,int y2,COLORREF color)
+{
+    int r = sqrt(pow((x2-x1), 2) + pow((y2-y1), 2));
+    Polar(hdc,x1,y1,r,color);
+
+}
+
+
 
 
 
@@ -401,7 +424,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         int x2 = x;
                         int y2 = y;
-
+                        Circle_Polar(hdc ,x1 ,y1 ,x2 ,y2,color);
                         click_count = 0; // reset click count
                     }
                     break;
