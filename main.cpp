@@ -161,6 +161,14 @@ void Draw8points(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
     SetPixel(hdc, xc+y, yc+x, color);
     SetPixel(hdc, xc-y, yc-x, color);
 }
+void Draw4points(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+{
+    SetPixel(hdc,xc-x,yc-y,color);
+    SetPixel(hdc,xc+x,yc-y,color);
+    SetPixel(hdc,xc-x,yc+y,color);
+    SetPixel(hdc,xc+x,yc+y,color);
+}
+
 
 int getRadius(int x1, int y1, int x2, int y2)
 {
@@ -460,21 +468,31 @@ void LineMidpoint (HDC hdc, int x1, int y1, int x2, int y2, COLORREF c)
 
 /// Ellipse
 /// (1) Polar
-void polarEllipse(HDC hdc, int xc, int yc, int a, int b, COLORREF c)
+void polarEllipse(HDC hdc, int x1, int y1, int x_2, int y_2, COLORREF c)
 {
 
     for(double theta = 0 ; theta<6.28 ; theta += 0.001)
     {
-        int x = Round(xc + a * cos(theta));
-        int y = Round(yc + b * sin(theta));
+        int x = Round(x1 + x_1 * cos(theta));
+        int y = Round(y1 + y_2 * sin(theta));
         SetPixel(hdc, x, y, c);
     }
 }
 
+/// (2) Direct
+void DirectEllipse(HDC hdc,int x_1, int y_1, int x_2, int y_2, COLORREF c)
+{
+    float x=x_2;
+    int y=0;
+    while(x>=0)
+    {
+       Draw4points(hdc,x_1,y_1,x,y,color);
+        x-=0.01;
+        y=y_2*sqrt(1-((x*x)/(x_2*x_2)));
+    }
+}
 
-
-
-/// **************************************** End my Work**********************************************************************
+/// ************************************************************* _End my Work_ **********************************************************************
 
 /*  This function is called by the Windows function DispatchMessage()  */
 
@@ -739,19 +757,18 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
                 case ellipse_dir:
                 {
-                    if (click_count == 0)
+                     if (click_count == 0)
                     {
-                        // code for start point
-                        click_count++;
-                    }
-                    else if (click_count == 1)
-                    {
-                        // code for point 1
+                        x_1 = x;
+                        y_1 = y;
                         click_count++;
                     }
                     else
                     {
-                        // code for point 2
+                         x_2 = x;
+                         y_2 = y;
+                        polarEllipse(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+
                         click_count = 0; // reset click count
                     }
                     break;
