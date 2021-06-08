@@ -133,6 +133,110 @@ enum algorithms{line_DDA, line_mid, line_para,
 int alg = line_DDA;
 int click_count = 0;
 
+
+/** Function filed */
+
+/// Point clipping
+void clip_point_algo(HDC hdc, int x,int y,int xleft,int ytop,int xright,int ybottom,COLORREF color)
+{
+if(x>=xleft && x<= xright && y>=ytop && y<=ybottom)
+
+SetPixel(hdc,x,y,color);
+}
+
+/// line clipping for a rectangle shape
+// union structure for the 4 bits
+union OutCode
+{
+    unsigned All:4;
+    struct
+    {
+        unsigned left:1,top:1,right:1,bottom:1;
+    };
+};
+OutCode GetOutCode(double x,double y,int xleft,int ytop,int xright,int ybottom)
+{
+    OutCode obj;
+    obj.All = 0;
+    if(x > xright)
+      obj.right = 1;
+    else if(x < xleft)
+      obj.left = 1;
+    if(y < ytop)
+      obj.top = 1;
+    else if(y > ybottom)
+      obj.bottom = 1;
+    return obj;
+}
+void VIntersect(double xs,double ys,double xe,double ye,int x,double *xi,double *yi)
+{
+    *xi=x;
+    *yi=ys+(x-xs)*(ye-ys)/(xe-xs);
+}
+void HIntersect(double xs,double ys,double xe,double ye,int y,double *xi,double *yi)
+{
+    *yi=y;
+    *xi=xs+(y-ys)*(xe-xs)/(ye-ys);
+}
+/** Parametric Algorithm to drew colored Line */
+void para_line(HDC hdc,int x1,int y1,int x2,int y2, COLORREF color){
+double dx=x2-x1;
+double dy=y2-y1;
+int x, y;
+for(double t=0;t<1;t+=0.001){
+     x = x1+(dx*t);
+     y = y1+(dy*t);
+    SetPixel(hdc,x,y,color);
+}
+}
+void clip_line_algo(HDC hdc,int xs,int ys,int xe,int ye,int xleft,int ytop,int xright,int ybottom)
+{
+    double x1=xs, y1=ys, x2=xe, y2=ye;
+    OutCode out1 = GetOutCode(x1,y1,xleft,ytop,xright,ybottom);
+    OutCode out2 = GetOutCode(x2,y2,xleft,ytop,xright,ybottom);
+    while( (out1.All || out2.All) && !(out1.All & out2.All))
+    {
+        double xi,yi;
+        if(out1.All)
+        {
+            if(out1.left)
+                VIntersect(x1,y1,x2,y2,xleft,&xi,&yi);
+            else if(out1.top)
+                HIntersect(x1,y1,x2,y2,ytop,&xi,&yi);
+            else if(out1.right)
+                VIntersect(x1,y1,x2,y2,xright,&xi,&yi);
+            else
+                HIntersect(x1,y1,x2,y2,ybottom,&xi,&yi);
+            x1=xi;
+            y1=yi;
+            out1=GetOutCode(x1,y1,xleft,ytop,xright,ybottom);
+        }
+        else
+        {
+            if(out2.left)
+                VIntersect(x1,y1,x2,y2,xleft,&xi,&yi);
+            else if(out2.top)
+                HIntersect(x1,y1,x2,y2,ytop,&xi,&yi);
+            else if(out2.right)
+                VIntersect(x1,y1,x2,y2,xright,&xi,&yi);
+            else
+                HIntersect(x1,y1,x2,y2,ybottom,&xi,&yi);
+            x2=xi;
+            y2=yi;
+            out2=GetOutCode(x2,y2,xleft,ytop,xright,ybottom);
+        }
+    }
+    if(!out1.All && !out2.All)
+    {
+
+        //MoveToEx(hdc,round(x1),round(y1),NULL);
+        //LineTo(hdc,round(x2),round(y2));
+        para_line(hdc, round(x1), round(y1), round(x2), round(y2), color);
+    }
+}
+
+
+
 /*  This function is called by the Windows function DispatchMessage()  */
 
 LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -216,6 +320,9 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         {
             int x = LOWORD(lParam);
             int y = HIWORD(lParam);
+            int x1, y1;
+            int X_left, Y_top, X_right, Y_bottom;
+            int X_start, Y_start, X_end, Y_end;
 
             switch (alg)
             {
@@ -404,21 +511,32 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     break;
                 }
 
+
                 case clip_point:
                 {
                     if (click_count == 0)
                     {
                         // code for start point of rectangular
+                        X_left=LOWORD(lParam);
+                        Y_top=HIWORD(lParam);
                         click_count++;
                     }
                     else if (click_count == 1)
                     {
                         // code for end point of rectangular
+                        X_right=LOWORD(lParam);
+                        Y_bottom=HIWORD(lParam);
+                        Rectangle(hdc, X_left,Y_top,X_right,Y_bottom);
                         click_count++;
                     }
                     else
                     {
                         // code for points
+                        //x1 = x;
+                        //y1 = y;
+                        x1=LOWORD(lParam);
+                        y1=HIWORD(lParam);
+                        clip_point_algo(hdc, x1, y1, X_left,Y_top,X_right,Y_bottom, color);
                         // resets by default when changing the algorithm (many points)
                     }
                     break;
@@ -429,18 +547,28 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     if (click_count == 0)
                     {
                         // code for start point of rectangular
+                        X_left=LOWORD(lParam);
+                        Y_top=HIWORD(lParam);
                     }
                     else if (click_count == 1)
                     {
                         // code for end point of rectangular
+                        X_right=LOWORD(lParam);
+                        Y_bottom=HIWORD(lParam);
+                        Rectangle(hdc, X_left,Y_top,X_right,Y_bottom);
                     }
                     else if (click_count % 2 == 0)
                     {
                         // code for start point of lines
+                        X_start=LOWORD(lParam);
+                        Y_start=HIWORD(lParam);
                     }
                     else
                     {
                         // code for end point of lines
+                        X_end=LOWORD(lParam);
+                        Y_end=HIWORD(lParam);
+                        clip_line_algo(hdc,X_start,Y_start,X_end,Y_end,X_left,Y_top,X_right,Y_bottom);
                         // resets by default when changing the algorithm (many lines)
                     }
 
