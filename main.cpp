@@ -8,6 +8,7 @@
 #include <windows.h>
 #include<math.h>
 #include <iostream>
+using namespace std;
 
 /* Colors */
 #define BLACK   RGB(0,0,0)
@@ -138,6 +139,8 @@ int click_count = 0;
 */
 
 
+int r;
+int x_1,y_1,x_2,y_2;
 
 /// Circle.
 
@@ -158,6 +161,12 @@ void Draw8points(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
     SetPixel(hdc, xc+y, yc+x, color);
     SetPixel(hdc, xc-y, yc-x, color);
 }
+
+int getRadius(int x1, int y1, int x2, int y2)
+{
+    return sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+}
+
 
 /// (1) MidPoint.
 void midpoint(HDC hdc,int xc,int yc,int r,COLORREF color)
@@ -182,13 +191,14 @@ void midpoint(HDC hdc,int xc,int yc,int r,COLORREF color)
 }
 void Circle_MidPoint(HDC hdc,int x1,int y1,int x2,int y2,COLORREF color)
 {
-               int r = sqrt(pow((x2-x1), 2) + pow((y2-y1), 2));
+                r = getRadius(x1,y1,x2,y2);
                 midpoint(hdc, x1, y1, r,color);
 }
 
 
 
 /// (2) Iterative Polar
+
 void IterativePolar(HDC hdc,int xc,int yc, int R,COLORREF color)
 {
     double x=R,y=0;
@@ -202,12 +212,13 @@ void IterativePolar(HDC hdc,int xc,int yc, int R,COLORREF color)
         double x1 = x*cdtheta-y*sdtheta;
         y = x*sdtheta+y*cdtheta;
         x = x1;
-        Draw8points(hdc,xc,yc,Round(x),Round(y),color);
+        Draw8points(hdc,Round(x),Round(y),xc,yc,color);
     }
 }
-void Circle_IterativePolar(HDC hdc , int x1,int y1,int x2,int y2,COLORREF color)
+
+void Circle_IterativePolar(HDC hdc,int x1,int y1,int x2,int y2,COLORREF color)
 {
-    int r = sqrt(pow((x2-x1), 2) + pow((y2-y1), 2));
+    r =  getRadius(x1,y1,x2,y2);
     IterativePolar(hdc,x1,y1,r,color);
 
 }
@@ -223,7 +234,7 @@ void Direct(HDC hdc,int xc,int yc, int R,COLORREF color)
         {
             x++;
             y=round(sqrt((double)(R2-x*x)));
-            Draw8points(hdc,xc,yc,x,y,color);
+            Draw8points(hdc,x,y,xc,yc,color);
         }
 }
 
@@ -247,7 +258,7 @@ void Polar(HDC hdc,int xc,int yc, int R,COLORREF color)
             theta+=dtheta;
             x=round(R*cos(theta));
             y=round(R*sin(theta));
-            Draw8points(hdc,xc,yc,x,y,color);
+            Draw8points(hdc,x,y,xc,yc,color);
         }
 }
 
@@ -276,14 +287,15 @@ void modified_midpoint(HDC hdc,int xc,int yc, int R,COLORREF color)
               y--;
         }
         x++;
-        Draw8points(hdc,xc,yc,x,y,color);
+        Draw8points(hdc,x,y,xc,yc,color);
         }
 }
 
-void Circle_modified_midpoint(HDC hdc , int x1,int y1,int x2,int y2,COLORREF color)
+void Circle_modified_midpoint(HDC hdc,int x1,int y1,int x2,int y2,COLORREF color)
 {
     int r = sqrt(pow((x2-x1), 2) + pow((y2-y1), 2));
     modified_midpoint(hdc,x1,y1,r,color);
+    /// midpoint(hdc,x1,y1,r,color);
 
 }
 ///-----------------------------------------------------------------------------------------------------------------------------------
@@ -446,7 +458,6 @@ void LineMidpoint (HDC hdc, int x1, int y1, int x2, int y2, COLORREF c)
 
 
 
-
 /// **************************************** End my Work**********************************************************************
 
 /*  This function is called by the Windows function DispatchMessage()  */
@@ -533,7 +544,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
             int x = LOWORD(lParam);
             int y = HIWORD(lParam);
 
-             int x1,y1;
+
 
             switch (alg)
             {
@@ -541,15 +552,15 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                      if (click_count == 0)
                     {
-                        x1 = x;
-                        y1 = y;
+                        x_1 = x;
+                        y_1 = y;
                         click_count++;
                     }
                     else
                     {
-                        int x2 = x;
-                        int y2 = y;
-                        DDA(hdc ,x1 ,y1 ,x2 ,y2,color);
+                        x_2 = x;
+                        y_2 = y;
+                        DDA(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
                         click_count = 0; // reset click count
                     }
                     break;
@@ -559,15 +570,15 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        x1 = x;
-                        y1 = y;
+                        x_1 = x;
+                        y_1 = y;
                         click_count++;
                     }
                     else
                     {
-                        int x2 = x;
-                        int y2 = y;
-                        LineMidpoint(hdc ,x1 ,y1 ,x2 ,y2,color);
+                         x_2 = x;
+                         y_2 = y;
+                        LineMidpoint(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
                         click_count = 0; // reset click count
                     }
                     break;
@@ -577,15 +588,15 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                      if (click_count == 0)
                     {
-                        x1 = x;
-                        y1 = y;
+                        x_1 = x;
+                        y_1 = y;
                         click_count++;
                     }
                     else
                     {
-                        int x2 = x;
-                        int y2 = y;
-                        parametric(hdc ,x1 ,y1 ,x2 ,y2,color);
+                        x_2 = x;
+                        y_2 = y;
+                        parametric(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
                         click_count = 0; // reset click count
                     }
                     break;
@@ -595,15 +606,15 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        x1 = x;
-                        y1 = y;
+                        x_1 = x;
+                        y_1 = y;
                         click_count++;
                     }
                     else
                     {
-                        int x2 = x;
-                        int y2 = y;
-                        Circle_Direct(hdc ,x1 ,y1 ,x2 ,y2,color);
+                        x_2 = x;
+                        y_2 = y;
+                        Circle_Direct(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
                         click_count = 0; // reset click count
                     }
                     break;
@@ -613,16 +624,16 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        x1 = x;
-                        y1 = y;
+                        x_1 = x;
+                        y_1 = y;
 
                         click_count++;
                     }
                     else
                     {
-                        int x2 = x;
-                        int y2 = y;
-                        Circle_Polar(hdc ,x1 ,y1 ,x2 ,y2,color);
+                        x_2 = x;
+                        y_2 = y;
+                        Circle_Polar(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
                         click_count = 0; // reset click count
                     }
                     break;
@@ -632,15 +643,16 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                         x1 = x;
-                         y1 = y;
+                         x_1 = x;
+                         y_1 = y;
                         click_count++;
                     }
                     else
                     {
-                        int x2 = x;
-                        int y2 = y;
-                        Circle_IterativePolar(hdc ,x1 ,y1 ,x2 ,y2,color);
+                         x_2 = x;
+                         y_2 = y;
+
+                        Circle_IterativePolar(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
                         click_count = 0; // reset click count
                     }
                     break;
@@ -650,15 +662,15 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        x1 = x;
-                        y1 = y;
+                        x_1 = x;
+                        y_1 = y;
                         click_count++;
                     }
                     else
                     {
-                        int x2 = x;
-                        int y2 = y;
-                        Circle_MidPoint(hdc ,x1 ,y1 ,x2 ,y2,color);
+                         x_2 = x;
+                         y_2 = y;
+                        Circle_MidPoint(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
 
                         click_count = 0; // reset click count
                     }
@@ -669,15 +681,15 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        x1 = x;
-                        y1 = y;
+                        x_1 = x;
+                        y_1 = y;
                         click_count++;
                     }
                     else
                     {
-                        int x2 = x;
-                        int y2 = y;
-                        Circle_modified_midpoint(hdc ,x1 ,y1 ,x2 ,y2,color);
+                         x_2 = x;
+                         y_2 = y;
+                        Circle_modified_midpoint(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
 
                         click_count = 0; // reset click count
                     }
