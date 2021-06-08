@@ -1,0 +1,10 @@
+1) git clone "URL" 
+2) git add .
+3) git commit -m "Bahaa part"
+4) git status
+5) git pull origin main  
+6) git push -u Bahaa main  
+7) git checkout -b Bahaa
+8) git checkout Bahaa
+9) git branch
+10) git push -u origin Bahaa
