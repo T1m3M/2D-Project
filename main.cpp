@@ -8,6 +8,7 @@
 #include <windows.h>
 #include<math.h>
 #include <iostream>
+//#include <bits/stdc++.h>
 
 /* Colors */
 #define BLACK   RGB(0,0,0)
@@ -55,6 +56,8 @@
 
 #define MI_CLIP_POINT 1027
 #define MI_CLIP_LINE 1028
+
+#define MAXENTRIES 600
 /*  Declare Windows procedure  */
 LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
 
@@ -234,6 +237,84 @@ void clip_line_algo(HDC hdc,int xs,int ys,int xe,int ye,int xleft,int ytop,int x
         para_line(hdc, round(x1), round(y1), round(x2), round(y2), color);
     }
 }
+/** Filling a quarter of a circle with lines */
+void Draw8points(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+{
+    SetPixel(hdc, xc+x, yc+y, color);
+    SetPixel(hdc, xc-x, yc+y, color);
+    SetPixel(hdc, xc+x, yc-y, color);
+    SetPixel(hdc, xc-x, yc-y, color);
+    SetPixel(hdc, xc-y, yc+x, color);
+    SetPixel(hdc, xc+y, yc-x, color);
+    SetPixel(hdc, xc+y, yc+x, color);
+    SetPixel(hdc, xc-y, yc-x, color);
+}
+void midpoint(HDC hdc,int xc,int yc,int r,COLORREF color)
+{
+    int x=0;
+    int y=r;
+    double d=1-r;
+    while(x<y){
+
+        if(d<=0){
+            d=d+2*x+3;
+            x++;
+        }
+        else{
+            d=d+2*(x-y)+5;
+            x++;
+            y--;
+        }
+        Draw8points(hdc,x,y,xc,yc,color);
+    }
+}
+struct Entry
+{
+    int xmin,xmax;
+};
+
+void InitEntries(Entry table[])
+{
+    for(int i=0; i < MAXENTRIES; i++)
+        {
+            table[i].xmin =  INT_MAX;
+            table[i].xmax = - INT_MAX;
+        }
+}
+void ScanEdge(POINT v1,POINT v2,Entry table[])
+{
+    if(v1.y==v2.y)return;
+    if(v1.y>v2.y)std::swap(v1,v2);
+    double minv=(double)(v2.x-v1.x)/(v2.y-v1.y);
+    double x=v1.x;
+    int y=v1.y;
+    while(y<v2.y){
+            if(x<table[y].xmin)table[y].xmin=(int)ceil(x);
+            if(x>table[y].xmax)table[y].xmax=(int)floor(x);
+            y++;
+            x+=minv;
+            }
+}
+void DrawSanLines(HDC hdc,Entry table[],COLORREF color)
+{
+for(int y=0;y<MAXENTRIES;y++)
+if(table[y].xmin<table[y].xmax)
+for(int x=table[y].xmin;x<=table[y].xmax;x++)
+SetPixel(hdc,x,y,color);
+}
+void fill_q1_algo(HDC hdc,POINT p[],int n,COLORREF color)
+{
+    Entry *table=new Entry[MAXENTRIES];
+    InitEntries(table);
+    POINT v1=p[n-1];
+    for(int i=0;i<n;i++){
+            POINT v2=p[i];
+            ScanEdge(v1,v2,table);
+            v1=p[i];
+            }
+    DrawSanLines(hdc,table,color);
+    delete table;
+}
 
 
 
@@ -320,7 +401,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
         {
             int x = LOWORD(lParam);
             int y = HIWORD(lParam);
-            int x1, y1;
+            int x_1, y_1, x_2, y_2; POINT P[8];
             int X_left, Y_top, X_right, Y_bottom;
             int X_start, Y_start, X_end, Y_end;
 
@@ -449,9 +530,75 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case fill_q1:
                 {
                     // code for quarter fill
+                    if(click_count == 0)
+                    {
+                          //x_1 = x; y_1 = y;
+                          x_1 = LOWORD(lParam);
+                          y_1 = HIWORD(lParam);
+                          click_count++;
+                    }
+                    else if(click_count == 1)
+                    {
+                          int rr;
+                          x_2 = LOWORD(lParam);
+                          y_2 = HIWORD(lParam);
+                          rr = sqrt(pow((x_2-x_1), 2) + pow((y_2-y_1), 2));
+                          midpoint(hdc, x_1, y_1, rr,color);
+                          click_count++;
+                    }
+                    else if(click_count == 2)
+                    {
+                          P[0].x = LOWORD(lParam);
+                          P[0].y = HIWORD(lParam);
+                          click_count++;
+                    }
+                    else if(click_count == 3)
+                    {
+                          P[1].x = LOWORD(lParam);
+                          P[1].y = HIWORD(lParam);
+                          click_count++;
+                    }
+                    else if(click_count == 4)
+                    {
+                          P[2].x = LOWORD(lParam);
+                          P[2].y = HIWORD(lParam);
+                          click_count++;
+                    }
+                    else if(click_count == 5)
+                    {
+                          P[3].x = LOWORD(lParam);
+                          P[3].y = HIWORD(lParam);
+                          click_count++;
+                    }
+                    else if(click_count == 6)
+                    {
+                          P[4].x = LOWORD(lParam);
+                          P[4].y = HIWORD(lParam);
+                          click_count++;
+                    }
+                    else if(click_count == 7)
+                    {
+                          P[5].x = LOWORD(lParam);
+                          P[5].y = HIWORD(lParam);
+                          click_count++;
+                    }
+                    else if(click_count == 8)
+                    {
+                          P[6].x = LOWORD(lParam);
+                          P[6].y = HIWORD(lParam);
+                          click_count++;
+                    }
+                    else
+                    {
+                          P[7].x = LOWORD(lParam);
+                          P[7].y = HIWORD(lParam);
+                          Polygon(hdc, P, 8);
+                          fill_q1_algo(hdc, P, 8, color);
+                          click_count=0;
+                    }
                     break;
                 }
-
+/*
                 case fill_q2:
                 {
                     // code for quarter fill
@@ -470,7 +617,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     // code for quarter fill
                     break;
                 }
-
+*/
                 case ellipse_dir:
                 {
                     if (click_count == 0)
@@ -534,9 +681,9 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         // code for points
                         //x1 = x;
                         //y1 = y;
-                        x1=LOWORD(lParam);
-                        y1=HIWORD(lParam);
-                        clip_point_algo(hdc, x1, y1, X_left,Y_top,X_right,Y_bottom, color);
+                        x_1=LOWORD(lParam);
+                        y_1=HIWORD(lParam);
+                        clip_point_algo(hdc, x_1, y_1, X_left,Y_top,X_right,Y_bottom, color);
                         // resets by default when changing the algorithm (many points)
                     }
                     break;
