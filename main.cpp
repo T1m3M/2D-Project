@@ -458,6 +458,22 @@ void LineMidpoint (HDC hdc, int x1, int y1, int x2, int y2, COLORREF c)
 
 
 
+/// Ellipse
+/// (1) Polar
+void polarEllipse(HDC hdc, int xc, int yc, int a, int b, COLORREF c)
+{
+
+    for(double theta = 0 ; theta<6.28 ; theta += 0.001)
+    {
+        int x = Round(xc + a * cos(theta));
+        int y = Round(yc + b * sin(theta));
+        SetPixel(hdc, x, y, c);
+    }
+}
+
+
+
+
 /// **************************************** End my Work**********************************************************************
 
 /*  This function is called by the Windows function DispatchMessage()  */
@@ -745,17 +761,16 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     if (click_count == 0)
                     {
-                        // code for start point
-                        click_count++;
-                    }
-                    else if (click_count == 1)
-                    {
-                        // code for point 1
+                        x_1 = x;
+                        y_1 = y;
                         click_count++;
                     }
                     else
                     {
-                        // code for point 2
+                         x_2 = x;
+                         y_2 = y;
+                        polarEllipse(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+
                         click_count = 0; // reset click count
                     }
                     break;
