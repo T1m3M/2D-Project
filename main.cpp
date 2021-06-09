@@ -1028,7 +1028,8 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 /************** File sub-menus **************/
                 case MI_CLEAR:
                 {
-                    /* Write clear code here */
+                    InvalidateRect(hwnd, NULL, TRUE);
+                    // delete the save dynamic array
                     std::cout << "Data is cleared!\n\n";
                     break;
                 }
