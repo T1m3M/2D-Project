@@ -678,9 +678,48 @@ void add_point(int x, int y)
 
 void add_shape(int shape_type, COLORREF shape_color)
 {
-    current_shape.type = line_DDA;
+    current_shape.type = shape_type;
     current_shape.color = shape_color;
     shapes.push_back(current_shape);
+    current_shape.data.clear(); // clear points
+}
+
+bool get_last_circle_data()
+{
+    for (int i = shapes.size() - 1; i >= 0; --i)
+    {
+        if (shapes[i].type == circle_mod_mid || shapes[i].type == circle_mid
+            || shapes[i].type == circle_iter || shapes[i].type == circle_polar
+            || shapes[i].type == circle_dir)
+        {
+            x_1 = shapes[i].data[0].x;
+            y_1 = shapes[i].data[0].y;
+            x_2 = shapes[i].data[1].x;
+            y_2 = shapes[i].data[1].y;
+
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
+void print_shapes(){ // for debugging only
+    for (int i = 0; i < shapes.size(); ++i)
+    {
+        cout << "TYPE = " << shapes[i].type << endl;
+        cout << "POINTS = ";
+        for (int j = 0; j < shapes[i].data.size(); ++j)
+            cout << "(" << shapes[i].data[j].x << ", " << shapes[i].data[j].y << ")" << " ";
+
+        cout << endl;
+    }
+}
+
+void save_data()
+{
+    print_shapes();
 }
 
 
@@ -956,16 +995,28 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case fill_q1:
                 {
                     // assign axes to the last circle in the shapes dynamic array
-                    filling_algo(hdc, x_1, y_1, x_2, y_2,1 ,color);
-                    add_shape(alg, color);
+                    bool circle_exist;
+                    circle_exist = get_last_circle_data();
+
+                    if (circle_exist)
+                    {
+                        filling_algo(hdc, x_1, y_1, x_2, y_2,1 ,color);
+                        add_shape(alg, color);
+                    }
 
                     break;
                 }
                 case fill_q2:
                 {
                     // assign axes to the last circle in the shapes dynamic array
-                    filling_algo(hdc, x_1, y_1, x_2, y_2,2 ,color);
-                    add_shape(alg, color);
+                    bool circle_exist;
+                    circle_exist = get_last_circle_data();
+
+                    if (circle_exist)
+                    {
+                        filling_algo(hdc, x_1, y_1, x_2, y_2,2 ,color);
+                        add_shape(alg, color);
+                    }
 
                     break;
                 }
@@ -973,8 +1024,14 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case fill_q3:
                 {
                     // assign axes to the last circle in the shapes dynamic array
-                    filling_algo(hdc, x_1, y_1, x_2, y_2,3 ,color);
-                    add_shape(alg, color);
+                    bool circle_exist;
+                    circle_exist = get_last_circle_data();
+
+                    if (circle_exist)
+                    {
+                        filling_algo(hdc, x_1, y_1, x_2, y_2, 3, color);
+                        add_shape(alg, color);
+                    }
 
                     break;
                 }
@@ -982,8 +1039,14 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case fill_q4:
                 {
                     // assign axes to the last circle in the shapes dynamic array
-                    filling_algo(hdc, x_1, y_1, x_2, y_2,4 ,color);
-                    add_shape(alg, color);
+                    bool circle_exist;
+                    circle_exist = get_last_circle_data();
+
+                    if (circle_exist)
+                    {
+                        filling_algo(hdc, x_1, y_1, x_2, y_2, 4, color);
+                        add_shape(alg, color);
+                    }
 
                     break;
                 }
@@ -1134,7 +1197,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_SAVE:
                 {
                     std::cout << "Saving the data...\n";
-                    /* Write save code here */
+                    save_data();
                     std::cout << "Data is saved!\n\n";
                     break;
                 }
