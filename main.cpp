@@ -8,6 +8,7 @@
 #include <windows.h>
 #include<math.h>
 #include <iostream>
+
 using namespace std;
 
 /* Colors */
@@ -493,6 +494,64 @@ void DirectEllipse(HDC hdc,int x_1, int y_1, int x_2, int y_2, COLORREF c)
 }
 
 /// ************************************************************* _End my Work_ **********************************************************************
+
+/// ******* Tawaty *******
+
+void fill_q1(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+{
+    SetPixel(hdc, xc+x, yc-y, color);
+    parametric(hdc, xc, yc, xc+x, yc-y,  color);
+    SetPixel(hdc, xc+y, yc-x, color);
+    parametric(hdc, xc, yc, xc+y, yc-x,  color);
+}
+void fill_q2(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+{
+    SetPixel(hdc, xc-x, yc-y, color);
+    parametric(hdc, xc, yc, xc-x, yc-y,  color);
+    SetPixel(hdc, xc-y, yc-x, color);
+    parametric(hdc, xc, yc, xc-y, yc-x,  color);
+}
+void fill_q3(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+{
+    SetPixel(hdc, xc-x, yc+y, color);
+    parametric(hdc, xc, yc, xc-x, yc+y,  color);
+    SetPixel(hdc, xc-y, yc+x, color);
+    parametric(hdc, xc, yc, xc-y, yc+x,  color);
+}
+void fill_q4(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+{
+    SetPixel(hdc, xc+x, yc+y, color);
+    parametric(hdc, xc, yc, xc+x, yc+y,  color);
+    SetPixel(hdc, xc+y, yc+x, color);
+    parametric(hdc, xc, yc, xc+y, yc+x,  color);
+}
+
+void filling_algo(HDC hdc,int xc,int yc,int r,int q, COLORREF color)
+{
+    int x=0;
+    int y=r;
+    double d=1-r;
+    while(x<y){
+        if(d<=0){
+            d=d+2*x+3;
+            x++;
+        }
+        else{
+            d=d+2*(x-y)+5;
+            x++;
+            y--;
+        }
+        if(q == 1)
+            fill_q1(hdc,x,y,xc,yc,color);
+        else if(q == 2)
+            fill_q2(hdc,x,y,xc,yc,color);
+        else if(q == 3)
+            fill_q3(hdc,x,y,xc,yc,color);
+        else
+            fill_q4(hdc,x,y,xc,yc,color);
+    }
+}
+
 
 /*  This function is called by the Windows function DispatchMessage()  */
 
