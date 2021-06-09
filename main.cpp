@@ -132,7 +132,7 @@ enum algorithms{line_DDA, line_mid, line_para,
                 circle_dir, circle_polar, circle_iter, circle_mid, circle_mod_mid,
                 fill_q1, fill_q2, fill_q3, fill_q4,
                 ellipse_dir, ellipse_polar,
-                clip_point, clip_line};
+                clip_point, clip_line, c_point, c_line};
 int alg = line_DDA;
 int click_count = 0;
 
@@ -789,7 +789,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         add_point(x_2, y_2);
 
                         DDA(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
-                        add_shape(line_DDA, color);
+                        add_shape(alg, color);
                         click_count = 0; // reset click count
                     }
                     break;
@@ -801,15 +801,18 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         x_1 = x;
                         y_1 = y;
+                        add_point(x_1, y_1);
                         click_count++;
                     }
                     else
                     {
                          x_2 = x;
                          y_2 = y;
+                        add_point(x_2, y_2);
                         LineMidpoint(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+                        add_shape(alg, color);
                         click_count = 0; // reset click count
-                        
+
                     }
                     break;
                 }
@@ -820,15 +823,18 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         x_1 = x;
                         y_1 = y;
+                        add_point(x_1, y_1);
                         click_count++;
                     }
                     else
                     {
                         x_2 = x;
                         y_2 = y;
+                        add_point(x_2, y_2);
                         parametric(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+                        add_shape(alg, color);
                         click_count = 0; // reset click count
-                        
+
                     }
                     break;
                 }
@@ -839,15 +845,18 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         x_1 = x;
                         y_1 = y;
+                        add_point(x_1, y_1);
                         click_count++;
                     }
                     else
                     {
                         x_2 = x;
                         y_2 = y;
+                        add_point(x_2, y_2);
                         Circle_Direct(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+                        add_shape(alg, color);
                         click_count = 0; // reset click count
-                        
+
                     }
                     break;
                 }
@@ -858,6 +867,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         x_1 = x;
                         y_1 = y;
+                        add_point(x_1, y_1);
 
                         click_count++;
                     }
@@ -865,9 +875,11 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         x_2 = x;
                         y_2 = y;
+                        add_point(x_2, y_2);
                         Circle_Polar(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+                        add_shape(alg, color);
                         click_count = 0; // reset click count
-                        
+
                     }
                     break;
                 }
@@ -878,16 +890,19 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                          x_1 = x;
                          y_1 = y;
+                        add_point(x_1, y_1);
                         click_count++;
                     }
                     else
                     {
                          x_2 = x;
                          y_2 = y;
+                        add_point(x_2, y_2);
 
                         Circle_IterativePolar(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+                        add_shape(alg, color);
                         click_count = 0; // reset click count
-                        
+
                     }
                     break;
                 }
@@ -898,16 +913,19 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         x_1 = x;
                         y_1 = y;
+                        add_point(x_1, y_1);
                         click_count++;
                     }
                     else
                     {
                          x_2 = x;
                          y_2 = y;
+                        add_point(x_2, y_2);
                         Circle_MidPoint(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+                        add_shape(alg, color);
 
                         click_count = 0; // reset click count
-                        
+
                     }
                     break;
                 }
@@ -918,16 +936,19 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         x_1 = x;
                         y_1 = y;
+                        add_point(x_1, y_1);
                         click_count++;
                     }
                     else
                     {
                          x_2 = x;
                          y_2 = y;
+                        add_point(x_2, y_2);
                         Circle_modified_midpoint(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+                        add_shape(alg, color);
 
                         click_count = 0; // reset click count
-                        
+
                     }
                     break;
                 }
@@ -936,14 +957,16 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     // assign axes to the last circle in the shapes dynamic array
                     filling_algo(hdc, x_1, y_1, x_2, y_2,1 ,color);
-                    
+                    add_shape(alg, color);
+
                     break;
                 }
                 case fill_q2:
                 {
                     // assign axes to the last circle in the shapes dynamic array
                     filling_algo(hdc, x_1, y_1, x_2, y_2,2 ,color);
-                    
+                    add_shape(alg, color);
+
                     break;
                 }
 
@@ -951,7 +974,8 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     // assign axes to the last circle in the shapes dynamic array
                     filling_algo(hdc, x_1, y_1, x_2, y_2,3 ,color);
-                    
+                    add_shape(alg, color);
+
                     break;
                 }
 
@@ -959,7 +983,8 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     // assign axes to the last circle in the shapes dynamic array
                     filling_algo(hdc, x_1, y_1, x_2, y_2,4 ,color);
-                    
+                    add_shape(alg, color);
+
                     break;
                 }
 
@@ -969,16 +994,19 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         x_1 = x;
                         y_1 = y;
+                        add_point(x_1, y_1);
                         click_count++;
                     }
                     else
                     {
                          x_2 = x;
                          y_2 = y;
+                        add_point(x_2, y_2);
                         polarEllipse(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+                        add_shape(alg, color);
 
                         click_count = 0; // reset click count
-                        
+
                     }
                     break;
                 }
@@ -989,16 +1017,19 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                     {
                         x_1 = x;
                         y_1 = y;
+                        add_point(x_1, y_1);
                         click_count++;
                     }
                     else
                     {
                          x_2 = x;
                          y_2 = y;
+                        add_point(x_2, y_2);
                         polarEllipse(hdc ,x_1 ,y_1 ,x_2 ,y_2,color);
+                        add_shape(alg, color);
 
                         click_count = 0; // reset click count
-                        
+
                     }
                     break;
                 }
@@ -1010,6 +1041,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         // code for start point of rectangular
                         X_left=x;
                         Y_top=y;
+                        add_point(X_left, Y_top);
                         click_count++;
                     }
                     else if (click_count == 1)
@@ -1017,18 +1049,22 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         // code for end point of rectangular
                         X_right=x;
                         Y_bottom=y;
+                        add_point(X_right, Y_bottom);
                         Rectangle(hdc, X_left,Y_top,X_right,Y_bottom);
+                        add_shape(alg, color);
                         click_count++;
-                        
+
                     }
                     else
                     {
                         // code for points
                         x_1=x;
                         y_1=y;
+                        add_point(x_1, y_1);
                         clip_point_algo(hdc, x_1, y_1, X_left,Y_top,X_right,Y_bottom, color);
+                        add_shape(c_point, color);
                         // resets by default when changing the algorithm (many points)
-                        
+
                     }
                     break;
                 }
@@ -1040,29 +1076,35 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         // code for start point of rectangular
                         X_left=x;
                         Y_top=y;
+                        add_point(X_left, Y_top);
                     }
                     else if (click_count == 1)
                     {
                         // code for end point of rectangular
                         X_right=x;
                         Y_bottom=y;
+                        add_point(X_right, Y_bottom);
                         Rectangle(hdc, X_left,Y_top,X_right,Y_bottom);
-                        
+                        add_shape(alg, color);
+
                     }
                     else if (click_count % 2 == 0)
                     {
                         // code for start point of lines
                         X_start=x;
                         Y_start=y;
+                        add_point(X_start, Y_start);
                     }
                     else
                     {
                         // code for end point of lines
                         X_end=x;
                         Y_end=y;
+                        add_point(X_end, Y_end);
                         clip_line_algo(hdc,X_start,Y_start,X_end,Y_end,X_left,Y_top,X_right,Y_bottom);
                         // resets by default when changing the algorithm (many lines)
-                        
+                        add_shape(c_line, color);
+
                     }
 
                     click_count++;
@@ -1083,7 +1125,8 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_CLEAR:
                 {
                     InvalidateRect(hwnd, NULL, TRUE);
-                    // delete the save dynamic array
+                    current_shape.data.clear(); // clear points
+                    shapes.clear(); // clear all shapes
                     std::cout << "Data is cleared!\n\n";
                     break;
                 }
@@ -1155,6 +1198,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_LINE_DDA:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = line_DDA;
                     std::cout << "algorithm changed to line DDA!\n\n"; break;
                 }
@@ -1162,6 +1206,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_LINE_MID:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = line_mid;
                     std::cout << "algorithm changed to line midpoint!\n\n"; break;
                 }
@@ -1169,6 +1214,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_LINE_PARA:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = line_para;
                     std::cout << "algorithm changed to line parametric!\n\n"; break;
                 }
@@ -1177,6 +1223,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_CIRCLE_DIRECT:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = circle_dir;
                     std::cout << "algorithm changed to circle direct!\n\n"; break;
                 }
@@ -1184,6 +1231,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_CIRCLE_POLAR:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = circle_polar;
                     std::cout << "algorithm changed to circle polar!\n\n"; break;
                 }
@@ -1191,6 +1239,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_CIRCLE_ITERATIVE:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = circle_iter;
                     std::cout << "algorithm changed to circle iterative!\n\n"; break;
                 }
@@ -1198,6 +1247,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_CIRCLE_MID:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = circle_mid;
                     std::cout << "algorithm changed to circle midpoint!\n\n"; break;
                 }
@@ -1205,6 +1255,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_CIRCLE_MOD_MID:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = circle_mod_mid;
                     std::cout << "algorithm changed to circle modified midpoint!\n\n"; break;
                 }
@@ -1238,6 +1289,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_ELLIPSE_DIRECT:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = ellipse_dir;
                     std::cout << "algorithm changed to ellipse direct!\n\n"; break;
                 }
@@ -1245,6 +1297,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_ELLIPSE_POLAR:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = ellipse_polar;
                     std::cout << "algorithm changed to ellipse polar!\n\n"; break;
                 }
@@ -1253,6 +1306,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_CLIP_POINT:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = clip_point;
                     std::cout << "algorithm changed to clip point!\n\n"; break;
                 }
@@ -1260,6 +1314,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_CLIP_LINE:
                 {
                     click_count = 0;
+                    current_shape.data.clear(); // clear points
                     alg = clip_line;
                     std::cout << "algorithm changed to clip line!\n\n"; break;
                 }
