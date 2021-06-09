@@ -625,7 +625,7 @@ void HIntersect(double xs,double ys,double xe,double ye,int y,double *xi,double 
     *xi=xs+(y-ys)*(xe-xs)/(ye-ys);
 }
 
-void clip_line_algo(HDC hdc,int xs,int ys,int xe,int ye,int xleft,int ytop,int xright,int ybottom)
+void clip_line_algo(HDC hdc,int xs,int ys,int xe,int ye,int xleft,int ytop,int xright,int ybottom, COLORREF color)
 {
     double x1=xs, y1=ys, x2=xe, y2=ye;
     OutCode out1 = GetOutCode(x1,y1,xleft,ytop,xright,ybottom);
@@ -822,6 +822,173 @@ void load_data()
     load_file.close();
 
     print_shapes();
+}
+
+void draw_data(HDC hdc)
+{
+    for (int i = 0; i < shapes.size(); ++i)
+    {
+        switch(shapes[i].type)
+        {
+            case line_DDA:
+            {
+                DDA(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case line_mid:
+            {
+                LineMidpoint(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case line_para:
+            {
+                parametric(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case circle_dir:
+            {
+                Circle_Direct(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case circle_polar:
+            {
+                Circle_Polar(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case circle_iter:
+            {
+                Circle_IterativePolar(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case circle_mid:
+            {
+                Circle_MidPoint(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case circle_mod_mid:
+            {
+                Circle_modified_midpoint(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case fill_q1:
+            {
+                // assign axes to the last circle in the shapes dynamic array
+                bool circle_exist;
+                circle_exist = get_last_circle_data();
+
+                if (circle_exist)
+                {
+                    filling_algo(hdc, x_1, y_1, x_2, y_2,1 ,shapes[i].color);
+                }
+
+                break;
+            }
+            case fill_q2:
+            {
+                // assign axes to the last circle in the shapes dynamic array
+                bool circle_exist;
+                circle_exist = get_last_circle_data();
+
+                if (circle_exist)
+                {
+                    filling_algo(hdc, x_1, y_1, x_2, y_2,2 ,shapes[i].color);
+                }
+
+                break;
+            }
+
+            case fill_q3:
+            {
+                // assign axes to the last circle in the shapes dynamic array
+                bool circle_exist;
+                circle_exist = get_last_circle_data();
+
+                if (circle_exist)
+                {
+                    filling_algo(hdc, x_1, y_1, x_2, y_2, 3, shapes[i].color);
+                }
+
+                break;
+            }
+
+            case fill_q4:
+            {
+                // assign axes to the last circle in the shapes dynamic array
+                bool circle_exist;
+                circle_exist = get_last_circle_data();
+
+                if (circle_exist)
+                {
+                    filling_algo(hdc, x_1, y_1, x_2, y_2, 4, shapes[i].color);
+                }
+
+                break;
+            }
+
+            case ellipse_dir:
+            {
+                polarEllipse(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case ellipse_polar:
+            {
+                polarEllipse(hdc ,shapes[i].data[0].x ,shapes[i].data[0].y ,shapes[i].data[1].x ,shapes[i].data[1].y,shapes[i].color);
+                break;
+            }
+
+            case clip_point:
+            {
+                X_left=shapes[i].data[0].x;
+                Y_top=shapes[i].data[0].y;
+                X_right=shapes[i].data[1].x;
+                Y_bottom=shapes[i].data[1].y;
+
+                Rectangle(hdc, X_left, Y_top, X_right, Y_bottom);
+                break;
+            }
+
+            case c_point:
+            {
+                clip_point_algo(hdc, shapes[i].data[0].x ,shapes[i].data[0].y, X_left,Y_top,X_right,Y_bottom, shapes[i].color);
+                break;
+            }
+
+            case clip_line:
+            {
+                X_left=shapes[i].data[0].x;
+                Y_top=shapes[i].data[0].y;
+                X_right=shapes[i].data[1].x;
+                Y_bottom=shapes[i].data[1].y;
+
+                Rectangle(hdc, X_left,Y_top,X_right,Y_bottom);
+                break;
+            }
+
+            case c_line:
+            {
+                X_start=shapes[i].data[0].x;
+                Y_start=shapes[i].data[0].y;
+                X_end=shapes[i].data[1].x;
+                Y_end=shapes[i].data[1].y;
+
+                clip_line_algo(hdc,X_start,Y_start,X_end,Y_end,X_left,Y_top,X_right,Y_bottom,shapes[i].color);
+                break;
+            }
+
+            default:
+                break;
+        }
+
+    }
 }
 
 
@@ -1266,7 +1433,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                         X_end=x;
                         Y_end=y;
                         add_point(X_end, Y_end);
-                        clip_line_algo(hdc,X_start,Y_start,X_end,Y_end,X_left,Y_top,X_right,Y_bottom);
+                        clip_line_algo(hdc,X_start,Y_start,X_end,Y_end,X_left,Y_top,X_right,Y_bottom, color);
                         // resets by default when changing the algorithm (many lines)
                         add_shape(c_line, color);
 
@@ -1308,6 +1475,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 {
                     std::cout << "Loading the data...\n";
                     load_data();
+                    draw_data(hdc);
                     std::cout << "Data is loaded!\n\n";
                     break;
                 }
