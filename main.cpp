@@ -497,28 +497,28 @@ void DirectEllipse(HDC hdc,int x_1, int y_1, int x_2, int y_2, COLORREF c)
 
 /// ******* Tawaty *******
 
-void fill_q1(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+void fillQ1(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
 {
     SetPixel(hdc, xc+x, yc-y, color);
     parametric(hdc, xc, yc, xc+x, yc-y,  color);
     SetPixel(hdc, xc+y, yc-x, color);
     parametric(hdc, xc, yc, xc+y, yc-x,  color);
 }
-void fill_q2(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+void fillQ2(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
 {
     SetPixel(hdc, xc-x, yc-y, color);
     parametric(hdc, xc, yc, xc-x, yc-y,  color);
     SetPixel(hdc, xc-y, yc-x, color);
     parametric(hdc, xc, yc, xc-y, yc-x,  color);
 }
-void fill_q3(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+void fillQ3(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
 {
     SetPixel(hdc, xc-x, yc+y, color);
     parametric(hdc, xc, yc, xc-x, yc+y,  color);
     SetPixel(hdc, xc-y, yc+x, color);
     parametric(hdc, xc, yc, xc-y, yc+x,  color);
 }
-void fill_q4(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
+void fillQ4(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
 {
     SetPixel(hdc, xc+x, yc+y, color);
     parametric(hdc, xc, yc, xc+x, yc+y,  color);
@@ -526,8 +526,9 @@ void fill_q4(HDC hdc,int x,int y,int xc,int yc,COLORREF color)
     parametric(hdc, xc, yc, xc+y, yc+x,  color);
 }
 
-void filling_algo(HDC hdc,int xc,int yc,int r,int q, COLORREF color)
+void filling_algo(HDC hdc,int xc,int yc,int x1, int y1,int q, COLORREF color)
 {
+    int r = getRadius(x1, y1, xc, yc);
     int x=0;
     int y=r;
     double d=1-r;
@@ -542,13 +543,13 @@ void filling_algo(HDC hdc,int xc,int yc,int r,int q, COLORREF color)
             y--;
         }
         if(q == 1)
-            fill_q1(hdc,x,y,xc,yc,color);
+            fillQ1(hdc,x,y,xc,yc,color);
         else if(q == 2)
-            fill_q2(hdc,x,y,xc,yc,color);
+            fillQ2(hdc,x,y,xc,yc,color);
         else if(q == 3)
-            fill_q3(hdc,x,y,xc,yc,color);
+            fillQ3(hdc,x,y,xc,yc,color);
         else
-            fill_q4(hdc,x,y,xc,yc,color);
+            fillQ4(hdc,x,y,xc,yc,color);
     }
 }
 
@@ -791,26 +792,28 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
 
                 case fill_q1:
                 {
-                    // code for quarter fill
+                    // assign axes to the last circle in the shapes dynamic array
+                    filling_algo(hdc, x_1, y_1, x_2, y_2,1 ,color);
                     break;
                 }
-
                 case fill_q2:
                 {
-                    // code for quarter fill
+                    // assign axes to the last circle in the shapes dynamic array
+                    filling_algo(hdc, x_1, y_1, x_2, y_2,2 ,color);
                     break;
                 }
 
                 case fill_q3:
                 {
-                    // code for quarter fill
+                    // assign axes to the last circle in the shapes dynamic array
+                    filling_algo(hdc, x_1, y_1, x_2, y_2,3 ,color);
                     break;
                 }
 
                 case fill_q4:
                 {
-
-                    // code for quarter fill
+                    // assign axes to the last circle in the shapes dynamic array
+                    filling_algo(hdc, x_1, y_1, x_2, y_2,4 ,color);
                     break;
                 }
 
