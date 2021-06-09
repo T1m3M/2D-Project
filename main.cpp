@@ -9,6 +9,8 @@
 #include<math.h>
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -705,7 +707,15 @@ bool get_last_circle_data()
 
 }
 
+void get_RGB_values(COLORREF color, int& R, int& G, int& B)
+{
+    R = color & 0xff;
+    G = (color >> 8) & 0xff;
+    B = (color >> 16) & 0xff;
+}
+
 void print_shapes(){ // for debugging only
+    int r, g, b;
     for (int i = 0; i < shapes.size(); ++i)
     {
         cout << "TYPE = " << shapes[i].type << endl;
@@ -714,11 +724,103 @@ void print_shapes(){ // for debugging only
             cout << "(" << shapes[i].data[j].x << ", " << shapes[i].data[j].y << ")" << " ";
 
         cout << endl;
+        get_RGB_values(shapes[i].color, r, g, b);
+        cout << "COLOR = ";
+        cout << r << " ";
+        cout << g << " ";
+        cout << b << endl;
+        cout << "============" << endl;
     }
 }
 
 void save_data()
 {
+    char filename[100];
+    ofstream save_file;
+    int r, g, b;
+
+    print_shapes();
+
+    cout << "Enter filename to save: ";
+    cin >> filename;
+    save_file.open(filename, ios::out | ios::trunc);
+
+    // saving shapes' entries
+    for (int i = 0; i < shapes.size(); ++i)
+    {
+        save_file << shapes[i].type << " ";
+        for (int j = 0; j < shapes[i].data.size(); ++j)
+        {
+            save_file << shapes[i].data[j].x << " " << shapes[i].data[j].y;
+            save_file << " ";
+        }
+        get_RGB_values(shapes[i].color, r, g, b);
+        save_file << r << " ";
+        save_file << g << " ";
+        save_file << b << '\n';
+
+    }
+
+    save_file.close();
+}
+
+void load_data()
+{
+    char filename[100];
+    char num[100];
+    string line;
+    ifstream load_file;
+    int r, g, b;
+
+    cout << "Enter filename to load: ";
+    cin >> filename;
+    load_file.open(filename, ios::in);
+
+    bool start_entry = true;
+
+    string space_delimiter = " ";
+    vector<string> words;
+
+    // loading shapes' entries
+    while(getline(load_file, line))
+    {
+        words.clear();
+        size_t pos = 0;
+        while ((pos = line.find(space_delimiter)) != string::npos) {
+            words.push_back(line.substr(0, pos));
+            line.erase(0, pos + space_delimiter.length());
+        }
+        words.push_back(line.substr(0, pos));
+
+        for (int i=0; i < words.size(); ++i) {
+
+            strcpy(num, words[i].c_str());
+
+            if (i == 0) current_shape.type = atoi(num);
+            else if (i >= words.size() - 3)
+            {
+                r = atoi(num); i++;
+                strcpy(num, words[i].c_str());
+                g = atoi(num); i++;
+                strcpy(num, words[i].c_str());
+                b = atoi(num);
+                current_shape.color = RGB(r,g,b);
+            }
+            else
+            {
+                strcpy(num, words[i++].c_str());
+                current_point.x = atoi(num);
+                strcpy(num, words[i].c_str());
+                current_point.y = atoi(num);
+                current_shape.data.push_back(current_point);
+            }
+        }
+        shapes.push_back(current_shape);
+        current_shape.data.clear();
+    }
+
+    load_file.close();
+
     print_shapes();
 }
 
@@ -1205,7 +1307,7 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
                 case MI_LOAD:
                 {
                     std::cout << "Loading the data...\n";
-                    /* Write load code here */
+                    load_data();
                     std::cout << "Data is loaded!\n\n";
                     break;
                 }
